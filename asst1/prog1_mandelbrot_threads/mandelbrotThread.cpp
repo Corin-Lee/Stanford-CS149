@@ -11,10 +11,10 @@ typedef struct {
   float y0, y1;
   unsigned int width;
   unsigned int height;
+  unsigned int numThreads;
   int maxIterations;
   int* output;
   int threadId;
-  int numThreads;
 } WorkerArgs;
 
 extern void mandelbrotSerial(float x0, float y0, float x1, float y1, int width,
@@ -25,23 +25,14 @@ extern void mandelbrotSerial(float x0, float y0, float x1, float y1, int width,
 // workerThreadStart --
 //
 // Thread entrypoint.
-void workerThreadStart(WorkerArgs* const args, int threadId) {
-  // TODO FOR CS149 STUDENTS: Implement the body of the worker
-  // thread here. Each thread should make a call to mandelbrotSerial()
-  // to compute a part of the output image.  For example, in a
-  // program that uses two threads, thread 0 could compute the top
-  // half of the image and thread 1 could compute the bottom half.
-
-  // printf("Hello world from thread %d\n", args->threadId);
-  int rowsPerThread = (args->height / args->numThreads);
-  int startRow = threadId * rowsPerThread;
-  int numRows = (threadId != args->numThreads - 1) ? rowsPerThread
-                                                   : (args->height - startRow);
-
+void workerThreadStart(WorkerArgs* const args, unsigned int threadId) {
   // double startTime = CycleTimer::currentSeconds();
-  mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width,
-                   args->height, startRow, numRows, args->maxIterations,
-                   args->output);
+  for (unsigned int cur_row = threadId; cur_row < args->height;
+       cur_row += args->numThreads) {
+    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width,
+                     args->height, cur_row, 1, args->maxIterations,
+                     args->output);
+  }
   // double endTime = CycleTimer::currentSeconds();
   // double minThread = std::min(1e30, endTime - startTime);
   // printf("[mandelbrot thread %d]:\t\t[%.3f] ms\n", threadId, minThread *
@@ -70,6 +61,7 @@ void mandelbrotThread(int numThreads, float x0, float y0, float x1, float y1,
   args.y1 = y1;
   args.width = width;
   args.height = height;
+  args.numThreads = numThreads;
   args.maxIterations = maxIterations;
   args.numThreads = numThreads;
   args.output = output;
