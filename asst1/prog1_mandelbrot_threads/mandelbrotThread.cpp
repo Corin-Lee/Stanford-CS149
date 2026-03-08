@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cstdlib>
 #include <thread>
 
@@ -14,8 +15,9 @@ typedef struct {
   unsigned int numThreads;
   int maxIterations;
   int* output;
-  int threadId;
 } WorkerArgs;
+
+std::atomic<unsigned int> rows;
 
 extern void mandelbrotSerial(float x0, float y0, float x1, float y1, int width,
                              int height, int startRow, int numRows,
@@ -25,10 +27,11 @@ extern void mandelbrotSerial(float x0, float y0, float x1, float y1, int width,
 // workerThreadStart --
 //
 // Thread entrypoint.
-void workerThreadStart(WorkerArgs* const args, unsigned int threadId) {
+void workerThreadStart(WorkerArgs* const args, int threadId) {
   // double startTime = CycleTimer::currentSeconds();
-  for (unsigned int cur_row = threadId; cur_row < args->height;
-       cur_row += args->numThreads) {
+  while (true) {
+    unsigned int cur_row = rows.fetch_add(1);
+    if (cur_row >= args->height) break;
     mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width,
                      args->height, cur_row, 1, args->maxIterations,
                      args->output);
@@ -53,7 +56,7 @@ void mandelbrotThread(int numThreads, float x0, float y0, float x1, float y1,
     exit(1);
   }
 
-  std::thread workers[numThreads];
+  std::thread workers[MAX_THREADS];
   WorkerArgs args;
   args.x0 = x0;
   args.y0 = y0;
@@ -63,12 +66,12 @@ void mandelbrotThread(int numThreads, float x0, float y0, float x1, float y1,
   args.height = height;
   args.numThreads = numThreads;
   args.maxIterations = maxIterations;
-  args.numThreads = numThreads;
   args.output = output;
 
   // Spawn the worker threads.  Note that only numThreads-1 std::threads
   // are created and the main application thread is used as a worker
   // as well.
+  rows = 0;
   for (int i = 1; i < numThreads; i++) {
     workers[i] = std::thread(workerThreadStart, &args, i);
   }
