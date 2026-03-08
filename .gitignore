@@ -1,0 +1,3 @@
+*.o
+*.ppm
+asst1/prog1_mandelbrot_threads/mandelbrot
