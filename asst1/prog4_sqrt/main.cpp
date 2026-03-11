@@ -29,7 +29,7 @@ int main() {
 
   float num = 2.998f + 0.001f * static_cast<float>(rand()) / RAND_MAX;
   for (unsigned int i = 0; i < N; i++) {
-    values[i] = num;
+    values[i] = i % 8 ? 1.0f : num;
   }
 
   // generate a gold version to check results
