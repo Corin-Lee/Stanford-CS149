@@ -2,3 +2,5 @@
 *.ppm
 asst1/prog1_mandelbrot_threads/mandelbrot
 asst1/prog2_vecintrin/myexp
+asst1/prog3_mandelbrot_ispc/objs
+asst1/prog3_mandelbrot_ispc/mandelbrot_ispc
