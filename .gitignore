@@ -1,0 +1,17 @@
+*.o
+*.ppm
+asst1/prog1_mandelbrot_threads/mandelbrot
+asst1/prog2_vecintrin/myexp
+asst1/prog3_mandelbrot_ispc/objs
+asst1/prog3_mandelbrot_ispc/mandelbrot_ispc
+asst1/prog4_sqrt/objs
+asst1/prog4_sqrt/sqrt
+asst1/prog5_saxpy/objs
+asst1/prog5_saxpy/saxpy
+asst1/prog6_kmeans/start.log
+asst1/prog6_kmeans/end.log
+asst1/prog6_kmeans/start.png
+asst1/prog6_kmeans/end.png
+asst1/prog6_kmeans/data.dat
+asst1/prog6_kmeans/kmeans
+asst1/prog6_kmeans/objs
